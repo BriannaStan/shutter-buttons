@@ -1,15 +1,13 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>shutter_buttons</name>
-  <version>1.0.0</version>
+  <version>2.0.0</version>
   <description>ROS interfaces to Arudino arcade buttons.</description>
 
   <maintainer email="a.lew@yale.edu">Sasha Lew</maintainer>
   <license>MIT</license>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <depend>std_msgs</depend>
-  <build_depend>message_generation</build_depend>
-  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>shutter_button_msgs</exec_depend>
   <exec_depend>rosserial_arduino</exec_depend>
 </package>
