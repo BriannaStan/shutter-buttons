@@ -1,0 +1,12 @@
+uint8 button_id
+bool pressed
+uint8 anim_type
+uint8 intensity
+uint8 color_r
+uint8 color_g
+uint8 color_b
+uint8 color_w
+uint8 bcolor_r
+uint8 bcolor_g
+uint8 bcolor_b
+uint8 bcolor_w
