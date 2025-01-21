@@ -36,11 +36,11 @@ their respective header in the include/ directory and source file in the src/ di
 
 To get and publish data to the metro M4 from ROS, follow the steps below:
 
-1. Add the shutter_tarzan repository to your Catkin workspace. Build your workspace, e.g., with `catkin_make`.
+1. Add the shutter_buttons repository to your Catkin workspace. Build your workspace, e.g., with `catkin_make`.
 
 2. Connect the Metro board to a computer over USB (e.g., say that it got connected to the port /dev/ttyACM0). The board should be powered.
 
-3. Start ROS (i.e., run `roscore`) and start the serial receiver (note that we depend on rosserial 0.7.7 included as a submodule!)
+3. Start ROS (i.e., run `roscore`) and start the serial receiver
 
 ```bash
 $ rosrun rosserial_python serial_node.py _port:=/dev/ttyACM0 _baud:=57600
@@ -49,7 +49,7 @@ $ rosrun rosserial_python serial_node.py _port:=/dev/ttyACM0 _baud:=57600
 4. Check the board is publishing the button(s) state, e.g., through the /button1/state topic:
 
 ```bash
-$ rostopic echo /button1/state 
+$ rostopic echo /button1/state
 data: False
 ---
 data: False
@@ -63,7 +63,7 @@ When the button is pressed, the topic should have the value "data: True".
 
 Each button has two states: `pressed` and `unpressed`. For each state, we can set different light animations to customize the behavior of the button. The available light animations are defined in include/light_animation.h,
 
-- **OFFLIGHTANIMATION (ID=0)** - Turns the LEDs off. 
+- **OFFLIGHTANIMATION (ID=0)** - Turns the LEDs off.
 - **SINGLECOLORANIMATION (ID=1)** - Makes the LEDs light up with all the same intensity and color.
 - **COLORWIPEANIMATION (ID=2)** - Wipe animation among two colors.
 - **COLORWHEELANIMATION (ID=3)** - Rainbow color wheel.
@@ -72,8 +72,8 @@ To change the behavior of a button, we can use the `/light_change` service publi
 
 ```bash
 rosservice call /light_change "{
-    button_id: 1, pressed: false, anim_type: 2, intensity: 50, 
-    color_r: 255, color_g: 255, color_b: 0, color_w: 0, 
+    button_id: 1, pressed: false, anim_type: 2, intensity: 50,
+    color_r: 255, color_g: 255, color_b: 0, color_w: 0,
     bcolor_r: 0, bcolor_g: 0, bcolor_b: 0, bcolor_w: 255}"
 ```
 
@@ -101,5 +101,4 @@ The service call returns one attribute:
 
 - When the white LEDs are turn on to the max intensity (255 value in [0,255] range), the lights look a bit shaky. The intensity does not look constant.
 
-- The ros_lib library (inside the lib/ directory) was generated with the command `rosrun rosserial_arduino make_libraries.py lib/`. See [this rosserial_arduino tutorial](http://wiki.ros.org/rosserial_arduino/Tutorials/Arduino%20IDE%20Setup) for more information. 
-
+- The ros_lib library (inside the lib/ directory) was generated with the command `rosrun rosserial_arduino make_libraries.py lib/`. See [this rosserial_arduino tutorial](http://wiki.ros.org/rosserial_arduino/Tutorials/Arduino%20IDE%20Setup) for more information.
