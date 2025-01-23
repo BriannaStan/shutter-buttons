@@ -7,8 +7,8 @@
 // Include custom classes
 #include <shutter_button.h>
 #include <light_animation.h>
-#include <shutter_buttons/LightChange.h>
-#include <shutter_buttons/LightChangeArray.h>
+#include <shutter_buttons_msgs/LightChange.h>
+#include <shutter_buttons_msgs/LightChangeArray.h>
 
 // Which pin on the Arduino is connected to the NeoPixels?
 // For Metro M4, has to be one of: 3, 6, 8, 11, A3 and MOSI
@@ -43,8 +43,8 @@ ShutterButton button2(BUTTONPIN2, NEOPIN2, NUM_LED, DEBOUNCE_DELAY, "button2/sta
 ShutterButton button3(BUTTONPIN3, NEOPIN3, NUM_LED, DEBOUNCE_DELAY, "button3/state");
 
 // Create callback for button animation change
-void lightChangeCb(const shutter_buttons::LightChangeArrayRequest& req,
-                         shutter_buttons::LightChangeArrayResponse& res)
+void lightChangeCb(const shutter_buttons_msgs::LightChangeArrayRequest& req,
+                         shutter_buttons_msgs::LightChangeArrayResponse& res)
 {
   // figure out which button we are changing and process the request
   /* if (req.button_id == 0) {
@@ -83,8 +83,8 @@ void lightChangeCb(const shutter_buttons::LightChangeArrayRequest& req,
 }
 
 // Create service for changing the way that a button works
-ros::ServiceServer<shutter_buttons::LightChangeArrayRequest, 
-                   shutter_buttons::LightChangeArrayResponse> light_service("light_change", &lightChangeCb);
+ros::ServiceServer<shutter_buttons_msgs::LightChangeArrayRequest, 
+                   shutter_buttons_msgs::LightChangeArrayResponse> light_service("light_change", &lightChangeCb);
 
 void setup() {
   // set button input
@@ -99,8 +99,8 @@ void setup() {
   nh.advertise(*(button1.getPublisher()));
   nh.advertise(*(button2.getPublisher()));
   nh.advertise(*(button3.getPublisher()));
-  nh.advertiseService<shutter_buttons::LightChangeArrayRequest, 
-                      shutter_buttons::LightChangeArrayResponse>(light_service);
+  nh.advertiseService<shutter_buttons_msgs::LightChangeArrayRequest, 
+                      shutter_buttons_msgs::LightChangeArrayResponse>(light_service);
 
 #ifdef SERIAL_VERBOSE
     Serial.begin(9600);

@@ -7,7 +7,7 @@
 #include <shutter_button.h>
 
 // Constructor
-ShutterButton::ShutterButton(int bpin, int npin, int nled, int delay, const char * pub_name) 
+ShutterButton::ShutterButton(int bpin, int npin, int nled, int delay, const char * pub_name)
 {
   button_pressed = false;
   last_debounce_time = 0;
@@ -40,8 +40,8 @@ ShutterButton::setup(uint8_t strip_brightness)
   unpressed_anim = std::shared_ptr<LightAnimation>(new SingleColorAnimation(strip, LIGHT_COLOR_BLUE, 100));
 }
 
-// Read button state taking care of potential debounce 
-void 
+// Read button state taking care of potential debounce
+void
 ShutterButton::read_button_state()
 {
     // read button
@@ -50,7 +50,7 @@ ShutterButton::read_button_state()
     // update debounce time if the switch changed
     if (new_button_state != button_state) {
         last_debounce_time = millis();
-    } 
+    }
 
     // update button variable only after debounce delay
     if ((millis() - last_debounce_time) > debounce_delay)
@@ -63,7 +63,7 @@ ShutterButton::read_button_state()
 }
 
 // Main function that checks the button state and updates coloring
-void 
+void
 ShutterButton::update()
 {
   read_button_state();
@@ -80,8 +80,8 @@ ShutterButton::update()
 }
 
 // Change animation function
-bool 
-ShutterButton::change_animation( const shutter_buttons::LightChange& req, std::shared_ptr<LightAnimation>& animation)
+bool
+ShutterButton::change_animation( const shutter_buttons_msgs::LightChange& req, std::shared_ptr<LightAnimation>& animation)
 {
     if (req.anim_type == LightAnimation::AnimType::OFFLIGHTANIMATION) {
       animation = std::shared_ptr<LightAnimation>(new OffLightAnimation(strip));
@@ -100,17 +100,16 @@ ShutterButton::change_animation( const shutter_buttons::LightChange& req, std::s
 
     } else {
       return false;
-      
     }
     return true;
 }
 
 // Change light animation callback function
-void 
-ShutterButton::lightChangeCb(shutter_buttons::LightChange const* req)
+void
+ShutterButton::lightChangeCb(shutter_buttons_msgs::LightChange const* req)
 {
   // process the request based on the type of animation we want to change
-  const shutter_buttons::LightChange& req1 = *req;
+  const shutter_buttons_msgs::LightChange& req1 = *req;
   if (req1.pressed) {
     change_animation(req1, pressed_anim);
   } else {

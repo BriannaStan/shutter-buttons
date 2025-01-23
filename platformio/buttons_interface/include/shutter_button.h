@@ -1,6 +1,6 @@
 #include <ros.h>
 #include <std_msgs/Bool.h>
-#include <shutter_buttons/LightChange.h>
+#include <shutter_buttons_msgs/LightChange.h>
 // #include <shutter_buttons/LightAnimationCmd.h>
 
 #include <memory>
@@ -84,9 +84,9 @@ public:
      * \param req: LightChange request
      * \param return: true if the change was successful; false otherwise
      **/
-    bool change_animation( const shutter_buttons::LightChange& req, std::shared_ptr<LightAnimation>& animation);
+    bool change_animation( const shutter_buttons_msgs::LightChange& req, std::shared_ptr<LightAnimation>& animation);
 
-    void lightChangeCb(shutter_buttons::LightChange const* req);
+    void lightChangeCb(shutter_buttons_msgs::LightChange const* req);
 
 };
 
