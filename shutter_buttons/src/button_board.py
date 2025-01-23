@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
 Buttons dashboard ROS node
 """
@@ -95,7 +95,7 @@ class ButtonBoard(ButtonUI):
         rospy.sleep(0.5)
         self.node.button_3_pub.publish(False)
 
-    
+
     def change_color(self, button_num, button_r, button_g, button_b):
         self.button_colors[button_num] = [button_r, button_g, button_b]
         self.update()
