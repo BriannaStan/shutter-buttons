@@ -1,3 +1,5 @@
+[TOC]
+
 ## Migrating from Shutter Tarzan
 
 There are four main migration steps:
@@ -52,7 +54,7 @@ rospack find shutter_buttons_msgs
 ```
 
 
-## Update Message Namespacing
+### Update Message Namespacing
 
 Because the ROS message and service definitions now reside in their own package, you will need to update existing code references to the new package namespacing, as enumerated below:
 
@@ -69,9 +71,22 @@ from shutter_buttons_msgs.srv import LightChangeArray
 Note that the core behaviour for changing button lights in `shutter_behaviors` has already been updated on the `master` branch, so pulling in the latest changes should apply the update automatically.
 
 
-## Flash Updated Firmware to Adafruit Metro
+### Flash Updated Firmware to Adafruit Metro
 
 Follow the instructions in the [PlatformIO wiki](https://gitlab.com/interactive-machines/shutter/shutter-buttons/-/wikis/platformio#generating-ros_lib) to rebuild ROS library headers.
 Then, rebuild the PlatformIO project and upload to the Adafruit Metro.
 
 > **NOTE:** This step will force every project that shares the same physical board to also update their messages, so communicate clearly that new firmware lives on your Adafruit Metro!
+
+
+## Launchfiles
+
+Existing launchfiles that start the virtual or physical (rosserial) buttons should still work; however, there are two new launch files in this package that are strongly recommended for new packages.
+
+For the virtual and physical buttons, respectively:
+
+- `shutter_buttons/launch/virtual_buttons.launch`
+- `shutter_buttons/launch/shutter_buttons.launch`
+
+In particular, note that the launchfile for the physical buttons exposes the serial device address and baud rate.
+While these values are not expected to be changed, it's possible that your specific application requires a different Adafruit Metro configuration, so the launchfile technically supports this potential parameterisation.
