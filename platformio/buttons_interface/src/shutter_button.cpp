@@ -1,13 +1,12 @@
 #include <Adafruit_NeoPixel_ZeroDMA.h>
-#undef max // hack for redefinition of min and max by arduino lib. See https://community.platformio.org/t/project-build-fails-after-latest-updates/8731/2
+#undef max // hack for redefinition of min and max by arduino lib
 #undef min
 
-#include <cstring>
-
 #include <shutter_button.h>
+#include <shutter_buttons_msgs/msg/light_change.h>
 
 // Constructor
-ShutterButton::ShutterButton(int bpin, int npin, int nled, int delay, const char * pub_name)
+ShutterButton::ShutterButton(int bpin, int npin, int nled, int delay)
 {
   button_pressed = false;
   last_debounce_time = 0;
@@ -18,9 +17,6 @@ ShutterButton::ShutterButton(int bpin, int npin, int nled, int delay, const char
   num_led = nled;
   strip = std::shared_ptr<Adafruit_NeoPixel_ZeroDMA>(
     new Adafruit_NeoPixel_ZeroDMA(num_led, neo_pin, NEO_GRBW + NEO_KHZ800));
-
-  // ROS setup
-  button_publisher = std::shared_ptr<ros::Publisher>(new ros::Publisher(pub_name, &button_pressed_msg));
 }
 
 // Setup
@@ -81,22 +77,23 @@ ShutterButton::update()
 
 // Change animation function
 bool
-ShutterButton::change_animation( const shutter_buttons_msgs::LightChange& req, std::shared_ptr<LightAnimation>& animation)
+ShutterButton::change_animation(const shutter_buttons_msgs__msg__LightChange* lc,
+                                 std::shared_ptr<LightAnimation>& animation)
 {
-    if (req.anim_type == LightAnimation::AnimType::OFFLIGHTANIMATION) {
+    if (lc->anim_type == LightAnimation::AnimType::OFFLIGHTANIMATION) {
       animation = std::shared_ptr<LightAnimation>(new OffLightAnimation(strip));
 
-    } else if (req.anim_type == LightAnimation::AnimType::SINGLECOLORANIMATION) {
-      LightColor color(req.color_r, req.color_g, req.color_b, req.color_w);
-      animation = std::shared_ptr<LightAnimation>(new SingleColorAnimation(strip, color, req.intensity));
+    } else if (lc->anim_type == LightAnimation::AnimType::SINGLECOLORANIMATION) {
+      LightColor color(lc->color_r, lc->color_g, lc->color_b, lc->color_w);
+      animation = std::shared_ptr<LightAnimation>(new SingleColorAnimation(strip, color, lc->intensity));
 
-    } else if (req.anim_type == LightAnimation::AnimType::COLORWHEELANIMATION) {
-      animation = std::shared_ptr<LightAnimation>(new ColorWheelAnimation(strip, req.intensity));
+    } else if (lc->anim_type == LightAnimation::AnimType::COLORWHEELANIMATION) {
+      animation = std::shared_ptr<LightAnimation>(new ColorWheelAnimation(strip, lc->intensity));
 
-    } else if (req.anim_type == LightAnimation::AnimType::COLORWIPEANIMATION) {
-      LightColor fcolor(req.color_r, req.color_g, req.color_b, req.color_w);
-      LightColor bcolor(req.bcolor_r, req.bcolor_g, req.bcolor_b, req.bcolor_w);
-      animation = std::shared_ptr<LightAnimation>(new ColorWipeAnimation(strip, fcolor, bcolor, req.intensity));
+    } else if (lc->anim_type == LightAnimation::AnimType::COLORWIPEANIMATION) {
+      LightColor fcolor(lc->color_r, lc->color_g, lc->color_b, lc->color_w);
+      LightColor bcolor(lc->bcolor_r, lc->bcolor_g, lc->bcolor_b, lc->bcolor_w);
+      animation = std::shared_ptr<LightAnimation>(new ColorWipeAnimation(strip, fcolor, bcolor, lc->intensity));
 
     } else {
       return false;
@@ -106,13 +103,12 @@ ShutterButton::change_animation( const shutter_buttons_msgs::LightChange& req, s
 
 // Change light animation callback function
 void
-ShutterButton::lightChangeCb(shutter_buttons_msgs::LightChange const* req)
+ShutterButton::lightChangeCb(const shutter_buttons_msgs__msg__LightChange* lc)
 {
   // process the request based on the type of animation we want to change
-  const shutter_buttons_msgs::LightChange& req1 = *req;
-  if (req1.pressed) {
-    change_animation(req1, pressed_anim);
+  if (lc->pressed) {
+    change_animation(lc, pressed_anim);
   } else {
-    change_animation(req1, unpressed_anim);
+    change_animation(lc, unpressed_anim);
   }
 }

@@ -1,13 +1,23 @@
 <?xml version="1.0"?>
-<package format="2">
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>shutter_buttons</name>
-  <version>2.0.0</version>
-  <description>ROS interfaces to Arudino arcade buttons.</description>
+  <version>3.0.0</version>
+  <description>ROS2 interfaces to Arduino arcade buttons with GUI</description>
 
   <maintainer email="a.lew@yale.edu">Sasha Lew</maintainer>
   <license>MIT</license>
 
-  <buildtool_depend>catkin</buildtool_depend>
-  <exec_depend>shutter_button_msgs</exec_depend>
-  <exec_depend>rosserial_arduino</exec_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+  <depend>shutter_buttons_msgs</depend>
+
+  <exec_depend>python3-py-trees</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
 </package>

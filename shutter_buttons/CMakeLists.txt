@@ -1,7 +1,30 @@
-cmake_minimum_required(VERSION 3.0.2)
-cmake_policy(SET CMP0048 NEW)
-project(shutter_buttons VERSION 2.0.0)
+cmake_minimum_required(VERSION 3.8)
+project(shutter_buttons)
 
-find_package(catkin REQUIRED)
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
 
-catkin_package()
+find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
+
+# install python package from src/
+install(DIRECTORY src/
+  DESTINATION "${PYTHON_INSTALL_DIR}/${PROJECT_NAME}"
+  PATTERN "__pycache__" EXCLUDE
+)
+
+# install launch files
+install(DIRECTORY launch/
+  DESTINATION share/${PROJECT_NAME}/launch
+  PATTERN "__pycache__" EXCLUDE
+)
+
+# install entry point script
+install(PROGRAMS
+  src/button_board.py
+  DESTINATION lib/${PROJECT_NAME}
+  RENAME button_board
+)
+
+ament_package()

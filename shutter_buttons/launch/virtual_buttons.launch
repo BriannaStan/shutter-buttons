@@ -1,3 +1,0 @@
-<launch>
-  <node pkg="shutter_buttons" name="button_board" type="button_board.py" output="screen"/>
-</launch>

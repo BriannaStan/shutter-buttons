@@ -1,7 +1,5 @@
-#include <ros.h>
-#include <std_msgs/Bool.h>
-#include <shutter_buttons_msgs/LightChange.h>
-// #include <shutter_buttons/LightAnimationCmd.h>
+#ifndef SHUTTERBUTTON_H
+#define SHUTTERBUTTON_H
 
 #include <memory>
 
@@ -10,8 +8,8 @@
 
 #include <light_animation.h>
 
-#ifndef SHUTTERBUTTON_H
-#define SHUTTERBUTTON_H
+// Forward declaration for micro-ROS message type
+struct shutter_buttons_msgs__msg__LightChange;
 
 class ShutterButton {
 
@@ -28,10 +26,6 @@ protected:
     std::shared_ptr<LightAnimation> unpressed_anim;     //!< unpressed anim
     std::shared_ptr<LightAnimation> pressed_anim;       //!< pressed anim
 
-    // ROS vars
-    std_msgs::Bool button_pressed_msg;
-    std::shared_ptr<ros::Publisher> button_publisher;
-
 public:
 
     /** Constructor
@@ -39,18 +33,15 @@ public:
      * \param npin: pin number for neopixel
      * \param nled: number of leds in round neopixel inside button
      * \param delay: debounce delay for the button (in milliseconds)
-     * \param pub_name: name of the topic through which the button state will be published
-     * \param sub_name: name of the topic through which animation commands will be received
      **/
-    ShutterButton(int bpin, int npin, int nled, int delay = 50, 
-                  const char * pub_name = "/button/state"); 
+    ShutterButton(int bpin, int npin, int nled, int delay = 50);
 
     /** Setup code for any button related things
      * \param strip_brightness: initial strip brightness
      **/
     void setup(uint8_t strip_brightness = 100);
 
-    /** Read button state taking care of potential debounce 
+    /** Read button state taking care of potential debounce
      **/
     void read_button_state();
 
@@ -58,37 +49,26 @@ public:
      **/
     void update();
 
-    /** Get button pressed state 
+    /** Get button pressed state
      **/
     inline bool isButtonPressed()
     {
         return button_pressed;
     }
 
-    /** Get publisher 
+    /** Change animation function (internal helper)
+     * \param lc: LightChange message pointer
+     * \param animation: animation pointer to update
+     * \return: true if the change was successful; false otherwise
      **/
-    inline std::shared_ptr<ros::Publisher>& getPublisher()
-    {
-        return button_publisher;
-    }
+    bool change_animation(const shutter_buttons_msgs__msg__LightChange* lc,
+                          std::shared_ptr<LightAnimation>& animation);
 
-    /** Publish current button state
+    /** Light change callback - called from service handler
+     * \param lc: LightChange message pointer
      **/
-    inline void publishButtonState()
-    {
-        button_pressed_msg.data = button_pressed;
-        button_publisher->publish( &button_pressed_msg );
-    }
-
-    /** Change animation function
-     * \param req: LightChange request
-     * \param return: true if the change was successful; false otherwise
-     **/
-    bool change_animation( const shutter_buttons_msgs::LightChange& req, std::shared_ptr<LightAnimation>& animation);
-
-    void lightChangeCb(shutter_buttons_msgs::LightChange const* req);
+    void lightChangeCb(const shutter_buttons_msgs__msg__LightChange* lc);
 
 };
-
 
 #endif
