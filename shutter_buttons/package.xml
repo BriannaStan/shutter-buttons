@@ -13,7 +13,7 @@
 
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
-  <depend>shutter_buttons_msgs</depend>
+  <depend>msgs</depend>
 
   <exec_depend>python3-py-trees</exec_depend>
 

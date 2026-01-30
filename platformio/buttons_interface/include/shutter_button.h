@@ -9,7 +9,7 @@
 #include <light_animation.h>
 
 // Forward declaration for micro-ROS message type
-struct shutter_buttons_msgs__msg__LightChange;
+struct msgs__msg__LightChange;
 
 class ShutterButton {
 
@@ -61,13 +61,13 @@ public:
      * \param animation: animation pointer to update
      * \return: true if the change was successful; false otherwise
      **/
-    bool change_animation(const shutter_buttons_msgs__msg__LightChange* lc,
+    bool change_animation(const msgs__msg__LightChange* lc,
                           std::shared_ptr<LightAnimation>& animation);
 
     /** Light change callback - called from service handler
      * \param lc: LightChange message pointer
      **/
-    void lightChangeCb(const shutter_buttons_msgs__msg__LightChange* lc);
+    void lightChangeCb(const msgs__msg__LightChange* lc);
 
 };
 

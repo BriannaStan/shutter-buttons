@@ -3,7 +3,7 @@
 #undef min
 
 #include <shutter_button.h>
-#include <shutter_buttons_msgs/msg/light_change.h>
+#include <msgs/msg/light_change.h>
 
 // Constructor
 ShutterButton::ShutterButton(int bpin, int npin, int nled, int delay)
@@ -77,7 +77,7 @@ ShutterButton::update()
 
 // Change animation function
 bool
-ShutterButton::change_animation(const shutter_buttons_msgs__msg__LightChange* lc,
+ShutterButton::change_animation(const msgs__msg__LightChange* lc,
                                  std::shared_ptr<LightAnimation>& animation)
 {
     if (lc->anim_type == LightAnimation::AnimType::OFFLIGHTANIMATION) {
@@ -103,7 +103,7 @@ ShutterButton::change_animation(const shutter_buttons_msgs__msg__LightChange* lc
 
 // Change light animation callback function
 void
-ShutterButton::lightChangeCb(const shutter_buttons_msgs__msg__LightChange* lc)
+ShutterButton::lightChangeCb(const msgs__msg__LightChange* lc)
 {
   // process the request based on the type of animation we want to change
   if (lc->pressed) {
