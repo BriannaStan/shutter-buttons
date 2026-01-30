@@ -8,9 +8,9 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 
-# install python package from src/
+# install python modules
 install(DIRECTORY src/
-  DESTINATION "${PYTHON_INSTALL_DIR}/${PROJECT_NAME}"
+  DESTINATION lib/${PROJECT_NAME}
   PATTERN "__pycache__" EXCLUDE
 )
 

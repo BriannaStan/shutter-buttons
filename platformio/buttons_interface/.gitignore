@@ -1,3 +1,6 @@
 lib/*
 .vscode*
 .pio*
+build/
+install/
+log/
