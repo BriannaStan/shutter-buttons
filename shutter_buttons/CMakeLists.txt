@@ -8,11 +8,8 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 
-# install python modules
-install(DIRECTORY src/
-  DESTINATION lib/${PROJECT_NAME}
-  PATTERN "__pycache__" EXCLUDE
-)
+# install python package
+ament_python_install_package(${PROJECT_NAME})
 
 # install launch files
 install(DIRECTORY launch/
