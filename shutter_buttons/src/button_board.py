@@ -14,7 +14,7 @@ from PySide2 import QtWidgets
 from PySide2.QtCore import QThread, Signal
 from std_msgs.msg import Bool
 
-from shutter_buttons_msgs.srv import LightChangeArray
+from msgs.srv import LightChangeArray
 from shutter_buttons.button_ui import ButtonUI
 
 

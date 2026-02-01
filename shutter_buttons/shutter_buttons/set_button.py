@@ -5,8 +5,8 @@
 # Created 02/13/2020 by Nathan Tsoi
 # Moved to shutter_buttons  17/01/2026
 
-from shutter_buttons_msgs.msg import LightChange
-from shutter_buttons_msgs.srv import LightChangeArray
+from msgs.msg import LightChange
+from msgs.srv import LightChangeArray
 
 from py_trees.behaviour import Behaviour
 from py_trees.common import Status
