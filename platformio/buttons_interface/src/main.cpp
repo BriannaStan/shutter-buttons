@@ -6,8 +6,8 @@
 #include <rclc/executor.h>
 
 #include <std_msgs/msg/bool.h>
-#include <msgs/msg/light_change.h>
-#include <msgs/srv/light_change_array.h>
+#include <shutter_buttons_msgs/msg/light_change.h>
+#include <shutter_buttons_msgs/srv/light_change_array.h>
 
 // custom classes
 #include <shutter_button.h>
@@ -52,8 +52,8 @@ rclc_executor_t executor;
 
 // Messages
 std_msgs__msg__Bool button_msg;
-msgs__srv__LightChangeArray_Request light_req;
-msgs__srv__LightChangeArray_Response light_res;
+shutter_buttons_msgs__srv__LightChangeArray_Request light_req;
+shutter_buttons_msgs__srv__LightChangeArray_Response light_res;
 
 // Button instances
 ShutterButton button1(BUTTONPIN1, NEOPIN1, NUM_LED, DEBOUNCE_DELAY);
@@ -73,14 +73,14 @@ void error_loop() {
 
 // Service callback
 void lightChangeCb(const void* req, void* res) {
-    const msgs__srv__LightChangeArray_Request* request =
-        (const msgs__srv__LightChangeArray_Request*)req;
-    msgs__srv__LightChangeArray_Response* response =
-        (msgs__srv__LightChangeArray_Response*)res;
+    const shutter_buttons_msgs__srv__LightChangeArray_Request* request =
+        (const shutter_buttons_msgs__srv__LightChangeArray_Request*)req;
+    shutter_buttons_msgs__srv__LightChangeArray_Response* response =
+        (shutter_buttons_msgs__srv__LightChangeArray_Response*)res;
 
     bool legal_index = true;
     for (size_t i = 0; i < 3; i++) {
-        const msgs__msg__LightChange* lc = &request->light_changes[i];
+        const shutter_buttons_msgs__msg__LightChange* lc = &request->light_changes[i];
 
         if (lc->button_id == 1) {
             button1.lightChangeCb(lc);
@@ -138,7 +138,7 @@ void setup() {
     // create service
     RCCHECK(rclc_service_init_default(
         &light_service, &node,
-        ROSIDL_GET_SRV_TYPE_SUPPORT(msgs, srv, LightChangeArray),
+        ROSIDL_GET_SRV_TYPE_SUPPORT(shutter_buttons_msgs, srv, LightChangeArray),
         "light_change"
     ));
 

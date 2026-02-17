@@ -13,9 +13,10 @@
 
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
-  <depend>msgs</depend>
+  <depend>shutter_buttons_msgs</depend>
 
-  <exec_depend>python3-py-trees</exec_depend>
+  <exec_depend>ros-jazzy-py-trees</exec_depend>
+  <exec_depend>micro_ros_agent</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
