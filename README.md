@@ -65,6 +65,9 @@ ros2 launch shutter_buttons shutter_buttons_launch.py port:=/dev/ttyACM0 baud:=1
 
 The Arduino firmware uses micro-ROS with custom message headers generated from `shutter_buttons_msgs`.
 
+> NOTE: flashing does not seem to work with the PlatformIO VSCode extension.
+> Instead, install the [PlatformIO CLI](https://docs.platformio.org/en/stable/core/installation/methods/installer-script.html#super-quick-macos-linux) and [shell commands](https://docs.platformio.org/en/stable/core/installation/shell-commands.html#method-1)
+
 To rebuild and flash:
 
 ```console
