@@ -15,7 +15,7 @@
   <depend>std_msgs</depend>
   <depend>shutter_buttons_msgs</depend>
 
-  <exec_depend>ros-jazzy-py-trees</exec_depend>
+  <exec_depend>py_trees</exec_depend>
   <exec_depend>micro_ros_agent</exec_depend>
 
   <export>
