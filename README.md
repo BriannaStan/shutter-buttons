@@ -65,7 +65,7 @@ ros2 launch shutter_buttons shutter_buttons_launch.py port:=/dev/ttyACM0 baud:=1
 
 The Arduino firmware uses micro-ROS with custom message headers generated from `shutter_buttons_msgs`.
 
-> NOTE: flashing does not seem to work with the PlatformIO VSCode extension.
+> **NOTE:** flashing does not seem to work with the PlatformIO VSCode extension.
 > Instead, install the [PlatformIO CLI](https://docs.platformio.org/en/stable/core/installation/methods/installer-script.html#super-quick-macos-linux) and [shell commands](https://docs.platformio.org/en/stable/core/installation/shell-commands.html#method-1)
 
 To rebuild and flash:
@@ -73,15 +73,16 @@ To rebuild and flash:
 ```console
 cd platformio/buttons_interface
 
-# clean previous micro-ROS build artifacts (required after renaming the msgs package)
-rm -rf .pio build install log
+# clean previous micro-ROS build artifacts (required after renaming the shutter_buttons_msgs package)
+rm -rf .pio
 
 # build and upload
 pio run -t upload
 ```
 
-The micro-ROS PlatformIO plugin will automatically pick up the `shutter_buttons_msgs` package
-from `extra_packages/` and generate the C headers during build.
+The micro-ROS PlatformIO plugin will automatically pick up the `shutter_buttons_msgs` package symlinked from `extra_packages/` and generate the C headers during build.
 
 > **NOTE:** Flashing new firmware will require every project sharing the same physical board
 > to also use the updated message definitions.
+
+If the PlatformIO compiler warns about udev rules, [update the rules from PlatformIO](https://docs.platformio.org/en/stable/core/installation/udev-rules.html) and restart the udev daemon (requires `sudo`).
