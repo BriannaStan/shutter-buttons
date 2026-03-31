@@ -34,6 +34,15 @@
 // Debounce delay
 #define DEBOUNCE_DELAY 50
 
+enum class ConnectionState {
+    INITIALIZING,
+    AWAITING_AGENT,
+    CONNECTING,
+    CONNECTED,
+    DISCONNECTED,
+};
+ConnectionState connection_state = ConnectionState::INITIALIZING;
+
 // micro-ROS entities
 rcl_allocator_t allocator;
 rclc_support_t support;
@@ -95,22 +104,7 @@ void lightChangeCb(const void* req, void* res) {
     response->result = legal_index;
 }
 
-void setup() {
-    // initialize serial for micro-ROS
-    Serial.begin(115200);
-    set_microros_serial_transports(Serial);
-
-    // setup LED indicator
-    pinMode(LED_BUILTIN, OUTPUT);
-    digitalWrite(LED_BUILTIN, HIGH);
-
-    // setup buttons HW
-    button1.setup();
-    button2.setup();
-    button3.setup();
-
-    delay(2000);  // wait for micro-ROS agent
-
+bool CreateEntities() {
     // initialize micro-ROS
     allocator = rcl_get_default_allocator();
     RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
@@ -150,7 +144,41 @@ void setup() {
         lightChangeCb
     ));
 
+    return true;
+}
+
+void DestroyEntities() {
+    rmw_context_t* rmw_context = rcl_context_get_rmw_context(&support.context);
+    (void)rmw_uros_set_context_entity_destroy_session_timeout(rmw_context, 0);
+
+    rcl_ret_t rc = RCL_RET_OK;
+    rc = rcl_publisher_fini(&button1_pub, &node);
+    rc = rcl_publisher_fini(&button2_pub, &node);
+    rc = rcl_publisher_fini(&button3_pub, &node);
+    rc = rcl_service_fini(&light_service, &node);
+    rclc_executor_fini(&executor);
+    rc = rcl_node_fini(&node);
+    rclc_support_fini(&support);
+}
+
+void setup() {
+    // initialize serial for micro-ROS
+    Serial.begin(115200);
+    set_microros_serial_transports(Serial);
+
+    // setup LED indicator
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, HIGH);
+
+    // setup buttons HW
+    button1.setup();
+    button2.setup();
+    button3.setup();
+
+    delay(2000);  // wait for micro-ROS agent
+
     digitalWrite(LED_BUILTIN, LOW);
+    connection_state = ConnectionState::AWAITING_AGENT;
 }
 
 void loop() {
@@ -165,18 +193,54 @@ void loop() {
                           button3.isButtonPressed();
     digitalWrite(LED_BUILTIN, button_pressed ? HIGH : LOW);
 
-    // publish button states for each button
-    button_msg.data = button1.isButtonPressed();
-    RCSOFTCHECK(rcl_publish(&button1_pub, &button_msg, NULL));
+    // event loop derivd from: <https://github.com/micro-ROS/micro_ros_platformio/blob/cfee17faffaa532363b7151dd13af6a85c69d3c1/examples/ethernet_pubsub/src/main.cpp>
+    switch (connection_state) {
+        case ConnectionState::AWAITING_AGENT:
+            if (RMW_RET_OK == rmw_uros_ping_agent(10, 1)) {
+                Serial.println("[ROS] Agent found, establishing connection...");
+                connection_state = ConnectionState::CONNECTING;
+            }
+            break;
 
-    button_msg.data = button2.isButtonPressed();
-    RCSOFTCHECK(rcl_publish(&button2_pub, &button_msg, NULL));
+        case ConnectionState::CONNECTING:
+            if (CreateEntities()) {
+                Serial.println("[ROS] Connected and ready!");
+                connection_state = ConnectionState::CONNECTED;
+            } else {
+                Serial.println("[ROS] Connection failed, retrying...");
+                connection_state = ConnectionState::AWAITING_AGENT;
+            }
+            break;
 
-    button_msg.data = button3.isButtonPressed();
-    RCSOFTCHECK(rcl_publish(&button3_pub, &button_msg, NULL));
+        case ConnectionState::CONNECTED:
+            if (RMW_RET_OK != rmw_uros_ping_agent(10, 1)) {
+                Serial.println("[ROS] Agent disconnected!");
+                connection_state = ConnectionState::DISCONNECTED;
+            } else {
+                // publish button states for each button
+                button_msg.data = button1.isButtonPressed();
+                RCSOFTCHECK(rcl_publish(&button1_pub, &button_msg, NULL));
 
-    // spin executor (handles service callbacks)
-    RCSOFTCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(10)));
+                button_msg.data = button2.isButtonPressed();
+                RCSOFTCHECK(rcl_publish(&button2_pub, &button_msg, NULL));
+
+                button_msg.data = button3.isButtonPressed();
+                RCSOFTCHECK(rcl_publish(&button3_pub, &button_msg, NULL));
+
+                // spin executor (handles service callbacks)
+                RCSOFTCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(10)));
+            }
+            break;
+
+        case ConnectionState::DISCONNECTED:
+            DestroyEntities();
+            Serial.println("[ROS] Waiting for agent...");
+            connection_state = ConnectionState::AWAITING_AGENT;
+            break;
+
+        default:
+            break;
+    }
 
     // might not be needed anymore
     delay(10); //!< changing this delay might result in "wrong checksum for topic id and msg" errors on the ROS side
