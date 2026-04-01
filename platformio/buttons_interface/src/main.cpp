@@ -242,6 +242,5 @@ void loop() {
             break;
     }
 
-    // might not be needed anymore
     delay(10); //!< changing this delay might result in "wrong checksum for topic id and msg" errors on the ROS side
 }
