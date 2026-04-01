@@ -1,92 +1,95 @@
-[TOC]
+# Shutter Buttons
 
-## Migrating from Shutter Tarzan
+ROS2 Jazzy interfaces to Arduino arcade buttons with GUI.
 
-There are four main migration steps:
+## Packages
 
-1. Clone the new `shutter-buttons` repository (this repository!) into the catkin workspace.
-1. Rebuild catkin workspace to include only the new buttons packages (i.e., the packages in this repository).
-1. Update message namespacing to `shutter_buttons_msg`.
-1. Flash updated firmware to Adafruit Metro (only needs to be done once per board).
+- **shutter_buttons_msgs** — Message and service definitions (`LightChange.msg`, `LightChangeArray.srv`)
+- **shutter_buttons** — ROS2 Python node with Qt GUI and py_trees behaviour
+- **platformio/buttons_interface** — micro-ROS firmware for Adafruit Metro M4
 
+## Building
 
-### Cloning the New Repository
-
-Make sure to clone into the `src` sub-directory of your catkin workspace.
-It is also possible that this repository has already been cloned with vcstool or as a git submodule.
-
-
-### Rebuilding the Workspace
-
-First, remove the old `shutter_buttons` package definition.
-
-You can remove the directory manually (e.g. with `rm -r`).
-Or, if you want to keep the old code, you can create an empty file `CATKIN_IGNORE` in the package root.
+Clone into the `src` directory of your colcon workspace and build:
 
 ```console
-# To keep the code
-roscd shutter_buttons && touch CATKIN_IGNORE
+cd <workspace>/src
+git clone <this-repo> shutter-buttons
 
-# To delete the code
-roscd shutter_buttons/.. && rm -rf shutter_buttons
+cd <workspace>
+colcon build --packages-select shutter_buttons_msgs shutter_buttons
+source install/setup.bash
 ```
 
-It is also possible that the old `shutter_buttons` directory has already been removed, for example by pulling from the master branch of `shutter-tarzan`.
+### Dependencies
 
-After removing the old package definition, clean the old package from your workspace.
+Install ROS dependencies via rosdep:
 
 ```console
-cd <path to your workspace root>
-catkin clean shutter_buttons
+rosdep install --from-paths src/shutter-buttons --ignore-src -y
 ```
 
-Finally, rebuild the `shutter_buttons` package and the new message definitions.
+Dependencies:
+- `rclpy`, `std_msgs` — ROS2 core
+- `shutter_buttons_msgs` — custom messages (this repo)
+- `ros-jazzy-py-trees` — behaviour trees (installed as a ROS package, not via pip)
+- `micro_ros_agent` — micro-ROS agent for serial communication with hardware
+- `PySide2` — Qt GUI (`pip install PySide2==5.15.0`)
 
-```console
-catkin build shutter_buttons shutter_buttons_msgs
+## Message Namespacing
 
-# verify with rospack
-rospack find shutter_buttons
-<path to new shutter-buttons>/shutter_buttons
-
-rospack find shutter_buttons_msgs
-<path to new shutter-buttons>/msgs
-```
-
-
-### Update Message Namespacing
-
-Because the ROS message and service definitions now reside in their own package, you will need to update existing code references to the new package namespacing, as enumerated below:
+Python imports use the `shutter_buttons_msgs` package:
 
 ```python
-# previous, deprecated imports:
-from shutter_buttons.msg import LightChange
-from shutter_buttons.srv import LightChangeArray
-
-# change to:
 from shutter_buttons_msgs.msg import LightChange
 from shutter_buttons_msgs.srv import LightChangeArray
 ```
 
-Note that the core behaviour for changing button lights in `shutter_behaviors` has already been updated on the `master` branch, so pulling in the latest changes should apply the update automatically.
+## Launch Files
 
+For the virtual buttons GUI:
 
-### Flash Updated Firmware to Adafruit Metro
+```console
+ros2 launch shutter_buttons virtual_buttons.launch.py
+```
 
-Follow the instructions in the [PlatformIO wiki](https://gitlab.com/interactive-machines/shutter/shutter-buttons/-/wikis/platformio#generating-ros_lib) to rebuild ROS library headers.
-Then, rebuild the PlatformIO project and upload to the Adafruit Metro.
+For the physical buttons (starts micro-ROS agent):
 
-> **NOTE:** This step will force every project that shares the same physical board to also update their messages, so communicate clearly that new firmware lives on your Adafruit Metro!
+```console
+ros2 launch shutter_buttons shutter_buttons.launch.py
 
+# optional: specify port and baud rate
+ros2 launch shutter_buttons shutter_buttons.launch.py port:=/dev/ttyACM0 baud:=115200
+```
 
-## Launchfiles
+A very simple test with the physical buttons, after launching the previous command:
 
-Existing launchfiles that start the virtual or physical (rosserial) buttons should still work; however, there are two new launch files in this package that are strongly recommended for new packages.
+```console
+ros2 run shutter_buttons rainbow
+```
 
-For the virtual and physical buttons, respectively:
+## Flashing Firmware (PlatformIO)
 
-- `shutter_buttons/launch/virtual_buttons.launch`
-- `shutter_buttons/launch/shutter_buttons.launch`
+The Arduino firmware uses micro-ROS with custom message headers generated from `shutter_buttons_msgs`.
 
-In particular, note that the launchfile for the physical buttons exposes the serial device address and baud rate.
-While these values are not expected to be changed, it's possible that your specific application requires a different Adafruit Metro configuration, so the launchfile technically supports this potential parameterisation.
+> **NOTE:** flashing does not seem to work with the PlatformIO VSCode extension.
+> Instead, install the [PlatformIO CLI](https://docs.platformio.org/en/stable/core/installation/methods/installer-script.html#super-quick-macos-linux) and [shell commands](https://docs.platformio.org/en/stable/core/installation/shell-commands.html#method-1)
+
+To rebuild and flash:
+
+```console
+cd platformio/buttons_interface
+
+# clean previous micro-ROS build artifacts (required after renaming the shutter_buttons_msgs package)
+rm -rf .pio
+
+# build and upload
+pio run -t upload
+```
+
+The micro-ROS PlatformIO plugin will automatically pick up the `shutter_buttons_msgs` package symlinked from `extra_packages/` and generate the C headers during build.
+
+> **NOTE:** Flashing new firmware will require every project sharing the same physical board
+> to also use the updated message definitions.
+
+If the PlatformIO compiler warns about udev rules, [update the rules from PlatformIO](https://docs.platformio.org/en/stable/core/installation/udev-rules.html) and restart the udev daemon (requires `sudo`).

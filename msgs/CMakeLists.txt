@@ -1,27 +1,18 @@
-cmake_minimum_required(VERSION 3.0.2)
-cmake_policy(SET CMP0048 NEW)
-project(shutter_buttons_msgs VERSION 2.0.0)
+cmake_minimum_required(VERSION 3.8)
+project(shutter_buttons_msgs)
 
-find_package(catkin REQUIRED COMPONENTS
-  message_generation
-  std_msgs
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+find_package(ament_cmake REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+find_package(std_msgs REQUIRED)
+
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/LightChange.msg"
+  "srv/LightChangeArray.srv"
+  DEPENDENCIES std_msgs
 )
 
-add_message_files(
-  FILES
-  LightChange.msg
-)
-
-add_service_files(
-  FILES
-  LightChangeArray.srv
-)
-
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-)
-
-catkin_package(
-  CATKIN_DEPENDS message_runtime std_msgs
-)
+ament_package()
