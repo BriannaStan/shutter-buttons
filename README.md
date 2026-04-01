@@ -57,8 +57,15 @@ For the physical buttons (starts micro-ROS agent):
 
 ```console
 ros2 launch shutter_buttons shutter_buttons_launch.py
+
 # optional: specify port and baud rate
 ros2 launch shutter_buttons shutter_buttons_launch.py port:=/dev/ttyACM0 baud:=115200
+```
+
+A very simple test with the physical buttons, after launching the previous command:
+
+```console
+ros2 run shutter_buttons rainbow
 ```
 
 ## Flashing Firmware (PlatformIO)

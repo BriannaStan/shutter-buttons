@@ -1,6 +1,8 @@
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess
+from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
+
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
@@ -18,14 +20,10 @@ def generate_launch_description():
     )
 
     # micro-ROS agent process
-    micro_ros_agent = ExecuteProcess(
-        cmd=[
-            'ros2', 'run', 'micro_ros_agent', 'micro_ros_agent',
-            'serial',
-            '--dev', LaunchConfiguration('port'),
-            '-b', LaunchConfiguration('baud')
-        ],
-        output='screen'
+    micro_ros_agent = Node(
+        package="micro_ros_agent",
+        executable="micro_ros_agent",
+        arguments=["serial", "--dev", LaunchConfiguration("port"), "-b", LaunchConfiguration("baud")]
     )
 
     return LaunchDescription([
