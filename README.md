@@ -50,16 +50,16 @@ from shutter_buttons_msgs.srv import LightChangeArray
 For the virtual buttons GUI:
 
 ```console
-ros2 launch shutter_buttons virtual_buttons_launch.py
+ros2 launch shutter_buttons virtual_buttons.launch.py
 ```
 
 For the physical buttons (starts micro-ROS agent):
 
 ```console
-ros2 launch shutter_buttons shutter_buttons_launch.py
+ros2 launch shutter_buttons shutter_buttons.launch.py
 
 # optional: specify port and baud rate
-ros2 launch shutter_buttons shutter_buttons_launch.py port:=/dev/ttyACM0 baud:=115200
+ros2 launch shutter_buttons shutter_buttons.launch.py port:=/dev/ttyACM0 baud:=115200
 ```
 
 A very simple test with the physical buttons, after launching the previous command:
