@@ -69,6 +69,12 @@ ShutterButton button1(BUTTONPIN1, NEOPIN1, NUM_LED, DEBOUNCE_DELAY);
 ShutterButton button2(BUTTONPIN2, NEOPIN2, NUM_LED, DEBOUNCE_DELAY);
 ShutterButton button3(BUTTONPIN3, NEOPIN3, NUM_LED, DEBOUNCE_DELAY);
 
+// exponential backoff
+const size_t BACKOFF_BASE = 2;
+const size_t MAX_BACKOFF = 6;
+size_t incident_count = 0;
+
+
 // Error handling macro
 #define RCCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){error_loop();}}
 #define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; (void)temp_rc; }
@@ -199,6 +205,12 @@ void loop() {
             if (RMW_RET_OK == rmw_uros_ping_agent(10, 1)) {
                 Serial.println("[ROS] Agent found, establishing connection...");
                 connection_state = ConnectionState::CONNECTING;
+                incident_count = 0;
+            } else {
+                incident_count = min(MAX_BACKOFF, incident_count + 1);
+                Serial.println("Waiting for [ROS] Agent, backing off");
+                size_t backoff = pow(BACKOFF_BASE, incident_count);
+                delay(backoff * 100);
             }
             break;
 

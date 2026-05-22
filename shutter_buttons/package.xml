@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>shutter_buttons</name>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
   <description>ROS2 interfaces to Arduino arcade buttons with GUI</description>
 
   <maintainer email="a.lew@yale.edu">Sasha Lew</maintainer>
