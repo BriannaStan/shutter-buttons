@@ -1,8 +1,8 @@
 import signal
 
-from PySide2 import QtGui, QtWidgets
-from PySide2.QtCore import QRect
-from PySide2.QtGui import QColor, QPalette
+from PySide6 import QtGui, QtWidgets
+from PySide6.QtCore import QRect
+from PySide6.QtGui import QColor, QPalette
 
 
 class ButtonUI(QtWidgets.QWidget):
@@ -83,7 +83,8 @@ class ButtonUI(QtWidgets.QWidget):
         qp = QtGui.QPainter()
         qp.begin(self)
 
-        qp.setRenderHint(QtGui.QPainter.Antialiasing)
+        #old pyside2 qp.setRenderHint(QtGui.QPainter.Antialiasing)
+        qp.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
         self.updateColors()
         qp.end()
 

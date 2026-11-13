@@ -5,13 +5,15 @@ Buttons dashboard ROS2 node
 
 import sys
 import time
+import PySide6
 
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy
 
-from PySide2 import QtWidgets
-from PySide2.QtCore import QThread, Signal
+from pathlib import Path
+from PySide6 import QtWidgets
+from PySide6.QtCore import QCoreApplication, QThread,  Signal, Slot
 from std_msgs.msg import Bool
 
 from shutter_buttons_msgs.srv import LightChangeArray
@@ -102,7 +104,7 @@ class ButtonBoard(ButtonUI):
 
     def button_1_unpress(self):
         super(ButtonBoard, self).button_1_unpress()
-        time.sleep(0.5)
+#        time.sleep(0.5)
         msg = Bool()
         msg.data = False
         self.node.button_1_pub.publish(msg)
@@ -115,7 +117,7 @@ class ButtonBoard(ButtonUI):
 
     def button_2_unpress(self):
         super(ButtonBoard, self).button_2_unpress()
-        time.sleep(0.5)
+#        time.sleep(0.5)
         msg = Bool()
         msg.data = False
         self.node.button_2_pub.publish(msg)
@@ -128,11 +130,12 @@ class ButtonBoard(ButtonUI):
 
     def button_3_unpress(self):
         super(ButtonBoard, self).button_3_unpress()
-        time.sleep(0.5)
+#        time.sleep(0.5)
         msg = Bool()
         msg.data = False
         self.node.button_3_pub.publish(msg)
 
+    @Slot(int, int, int, int)
     def change_color(self, button_num, button_r, button_g, button_b):
         self.button_colors[button_num] = [button_r, button_g, button_b]
         self.update()
@@ -152,8 +155,13 @@ class ButtonBoard(ButtonUI):
         self.node.stop()
         event.accept()
 
-
 def main(args=None):
+
+    qt_plugins = (
+        Path(PySide6.__file__).resolve().parent / "Qt" / "plugins"
+    )
+    QCoreApplication.setLibraryPaths([str(qt_plugins)])
+
     app = QtWidgets.QApplication(sys.argv)
     buttons_gui = ButtonBoard()
 
@@ -161,7 +169,8 @@ def main(args=None):
     geo = qscreen.geometry()
     buttons_gui.move(geo.left(), geo.top())
 
-    sys.exit(app.exec_())
+    #old PySide2 sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 
 if __name__ == '__main__':

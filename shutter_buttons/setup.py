@@ -23,7 +23,8 @@ setup(
     license='MIT',
     entry_points={
         'console_scripts': [
-            'rainbow = shutter_buttons.rainbow:main'
+            'rainbow = shutter_buttons.rainbow:main',
+            'button_board = shutter_buttons.button_board:main',
         ],
     },
 )
